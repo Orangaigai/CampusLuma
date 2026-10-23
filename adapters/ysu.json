@@ -1,0 +1,137 @@
+{
+  "requiresUserSsid": true,
+  "defaultSsid": "",
+  "kind": "browser",
+  "schemaVersion": 1,
+  "entry": "engine/campus-network-reconnect.ps1",
+  "fallbackPortal": "https://auth1.ysu.edu.cn/",
+  "browser": {
+    "accountTabTexts": ["账号", "账号登录", "密码登录"],
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "input[name=\"username\"]",
+      "input[name=\"userName\"]",
+      "input[autocomplete=\"username\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "#login_submit",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "discoveryProbes": [
+      "http://www.msftconnecttest.com/connecttest.txt",
+      "http://www.163.com/",
+      "http://1.1.1.1/"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "services": [
+      {
+        "value": "campus",
+        "label": "校园网",
+        "aliases": [
+          "校园网",
+          "教育网"
+        ]
+      },
+      {
+        "value": "mobile",
+        "label": "移动",
+        "aliases": [
+          "中国移动",
+          "移动"
+        ]
+      },
+      {
+        "value": "unicom",
+        "label": "联通",
+        "aliases": [
+          "中国联通",
+          "联通"
+        ]
+      },
+      {
+        "value": "telecom",
+        "label": "电信",
+        "aliases": [
+          "中国电信",
+          "电信"
+        ]
+      }
+    ],
+    "requireNetworkRedirect": true,
+    "serviceSelection": {
+      "containerSelectors": [
+        "[data-service-selection]",
+        "ion-alert",
+        "app-service-selection",
+        ".service-selection",
+        "body"
+      ],
+      "optionSelectors": [
+        "[role=\"radio\"]",
+        "ion-radio",
+        "label.service",
+        "button.service",
+        "span.service",
+        ".service-box"
+      ],
+      "confirmSelectors": [
+        "button:has-text(\"确定\")",
+        "button:has-text(\"确认\")",
+        "[role=\"button\"]:has-text(\"确定\")",
+        "ion-button:has-text(\"确定\")"
+      ],
+      "promptPattern": "请选择(?:服务|运营商)|选择(?:服务|运营商)"
+    }
+  },
+  "trustedOrigins": [
+    "https://auth1.ysu.edu.cn",
+    "http://auth1.ysu.edu.cn",
+    "https://cer.ysu.edu.cn"
+  ],
+  "verification": "浏览器规则原型，未通过校内真实认证。2026 年校方明确旧入口失效，新入口 auth1；统一认证 cer；Wi-Fi 名称须本人填写，未猜默认值。",
+  "name": "燕山大学",
+  "id": "ysu",
+  "checkedOn": "2026-10-16",
+  "evidence": [
+    "https://notice.ysu.edu.cn/info/2073/24740.htm",
+    "https://github.com/wide-sky-with-me/ysu_net",
+    "https://github.com/KamijoToma/YSUNetLoginv2"
+  ],
+  "enabled": false
+}

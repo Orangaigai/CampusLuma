@@ -1,0 +1,94 @@
+{
+  "id": "xtu",
+  "name": "湘潭大学",
+  "enabled": true,
+  "kind": "browser",
+  "entry": "engine/campus-network-reconnect.ps1",
+  "defaultSsid": "XTU-FREE-2",
+  "fallbackPortal": "https://zz.xtu.edu.cn/pc/center",
+  "trustedOrigins": [
+    "https://zz.xtu.edu.cn",
+    "http://zz.xtu.edu.cn",
+    "http://172.16.0.32:8080"
+  ],
+  "capabilities": [
+    "dynamic-redirect",
+    "iframe",
+    "agreement",
+    "image-captcha-ocr",
+    "internet-verification"
+  ],
+  "verification": "2026-10-16: independent real unauthenticated recovery verified; Windows clock 10:09:58 -> online 10:10:05 CST.",
+  "schemaVersion": 1,
+  "browser": {
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "#userId",
+      "input[autocomplete=\"username\"]",
+      "input[name=\"username\"]",
+      "input[name=\"userId\"]",
+      "input[name=\"account\"]",
+      "input[placeholder*=\"学工号\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]",
+      "input[placeholder*=\"用户名\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "button:has-text(\"登陆\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "selfServiceUrl": "https://zz.xtu.edu.cn/self/index",
+    "discoveryProbes": [
+      "http://www.baidu.com/",
+      "http://1.2.3.4/",
+      "http://www.msftconnecttest.com/connecttest.txt"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "selfService": {
+      "readyTexts": [
+        "在线设备",
+        "我的设备"
+      ],
+      "devicesLinkText": "我的设备",
+      "currentTerminalText": "当前终端",
+      "offlineButtonText": "下线",
+      "disableNoSenseText": "关闭无感",
+      "recentOnlinePattern": "20\\d\\d-\\d\\d-\\d\\d\\s+\\d\\d:\\d\\d:\\d\\d"
+    },
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "diagnosticScriptPattern": "kick-offline|noPerceptual|no-perceptual|nosense|guanBiWuGan|kaiQiWuGan|关闭无感"
+  }
+}

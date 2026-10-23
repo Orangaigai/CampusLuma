@@ -1,0 +1,84 @@
+{
+  "requiresUserSsid": false,
+  "defaultSsid": "DLUT-PanJin",
+  "kind": "browser",
+  "schemaVersion": 1,
+  "entry": "engine/campus-network-reconnect.ps1",
+  "fallbackPortal": "http://pjrz.dlut.edu.cn/",
+  "browser": {
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "input[name=\"username\"]",
+      "input[name=\"userName\"]",
+      "input[autocomplete=\"username\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "#login_submit",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "discoveryProbes": [
+      "http://1.1.1.1/",
+      "http://www.msftconnecttest.com/connecttest.txt",
+      "http://www.163.com/"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "requireNetworkRedirect": true,
+    "entryPathPatterns": [
+      "^/(?:portal/(?:portal-main(?:/|$)|entry/)|eportal/(?:index\\.jsp|redirect\\.jsp)$|cas-sso/login(?:/|$))"
+    ],
+    "requireGatewayParameters": true
+  },
+  "trustedOrigins": [
+    "http://pjrz.dlut.edu.cn",
+    "https://pjrz.dlut.edu.cn"
+  ],
+  "verification": "2025-10-14 新 SAM5 通知和正式手册核对，旧 172.17.3.10 深澜项目不采用。通知与手册 SSID 拼写有差异，请确认现场 Wi-Fi；自助网址不作为无上下文认证。校内真实联网待验收。",
+  "name": "大连理工大学（盘锦）",
+  "id": "dlut-panjin",
+  "checkedOn": "2026-10-17",
+  "evidence": [
+    "https://panjin.dlut.edu.cn/info/1141/47063.htm",
+    "https://pjxqzwb.dlut.edu.cn/index/gztz.htm"
+  ],
+  "enabled": false,
+  "ssidHints": [
+    "DLUT-PanJin",
+    "DUT-Panjin"
+  ]
+}

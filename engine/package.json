@@ -1,0 +1,19 @@
+{
+  "name": "campusluma-engine",
+  "version": "0.1.0-preview.1",
+  "private": true,
+  "type": "module",
+  "description": "CampusLuma school-specific browser and HTTP portal authentication",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "ddddocr-node": "2.3.0",
+    "iconv-lite": "0.7.3",
+    "playwright-core": "1.64.0"
+  }
+}

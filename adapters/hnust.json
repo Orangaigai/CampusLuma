@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "hnust",
+  "name": "湖南科技大学",
+  "enabled": false,
+  "kind": "drcom-query",
+  "entry": "engine/campus-network-reconnect.ps1",
+  "defaultSsid": "iHNUST",
+  "fallbackPortal": "http://login.hnust.cn/",
+  "trustedOrigins": ["http://login.hnust.cn", "http://192.168.254.226", "http://192.168.254.226:801"],
+  "verification": "2026-10-16 原型，官方帮助正文更新到 2026-08-25；当前页指纹、协议与本机隔离测试，校内真实认证待验收。",
+  "evidence": ["https://support.hnust.edu.cn/yysbd/", "https://support.hnust.edu.cn/waytologin/", "https://github.com/dezige131/hnust-drcom-auth/tree/adec498fdf1ad932e138a4bcb5ccaaadbce651d8", "https://github.com/Arrowes/iHNUST-net"],
+  "protocol": {
+    "schemaVersion": 1,
+    "mode": "drcom-query",
+    "roots": ["http://login.hnust.cn/", "http://192.168.254.226/"],
+    "apiOrigin": "http://192.168.254.226:801",
+    "loginPath": "/eportal/portal/login",
+    "jsVersion": "4.2.1",
+    "services": [{"label":"校园网","value":""},{"label":"电信","value":"telecom"},{"label":"移动","value":"cmcc"},{"label":"联通","value":"unicom"}],
+    "checkedOn": "2026-10-16",
+    "notes": ["桌面终端使用 ,0,账号@运营商；不使用路由器项目默认的手机类型。", "宿舍区需绑定运营商；校园网选项在不同区域可能只有校内访问，外网不通不报成功。", "不使用统一身份认证 CAS 页面作为联网认证。", "当前页无法识别时停止，不向旧接口试发密码。"]
+  }
+}

@@ -1,0 +1,43 @@
+name: 连接或计划任务故障
+description: 报告不能连接、没有到点执行或界面问题
+title: "[故障] "
+body:
+  - type: markdown
+    attributes:
+      value: 请勿发送密码、Cookie、完整认证链接、原始 HAR 或个人配置。优先附上“运行记录”导出的反馈，上传前再检查。
+  - type: input
+    id: version
+    attributes:
+      label: 程序版本与 Windows 版本
+      placeholder: 0.1.0-preview.1 / Windows 11
+    validations:
+      required: true
+  - type: input
+    id: school
+    attributes:
+      label: 学校与校区
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 发生了什么，怎样复现？
+      description: 说明预期行为、实际行为、手动或定时、时间及结果码。远控离线与本机打不开网页请分别说明。
+    validations:
+      required: true
+  - type: dropdown
+    id: tunnel
+    attributes:
+      label: VPN / 代理情况
+      options:
+        - 未使用
+        - 系统代理
+        - TUN / 虚拟网卡
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: 脱敏反馈或截图
+      description: 可拖入“运行记录”导出的反馈；不要贴个人运行目录。

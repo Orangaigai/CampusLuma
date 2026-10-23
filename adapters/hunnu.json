@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "hunnu",
+  "name": "湖南师范大学",
+  "enabled": false,
+  "kind": "drcom-aes",
+  "entry": "engine/campus-network-reconnect.ps1",
+  "defaultSsid": "HUNNU",
+  "fallbackPortal": "http://192.168.250.250/",
+  "trustedOrigins": ["http://192.168.250.250", "http://192.168.250.250:801"],
+  "verification": "2026-10-16 原型；现行官网仍链接 2023-08-20 使用指南，2026-06 源码提供加密流程；当前校内页面及全部校区尚未实测。",
+  "evidence": ["https://io.hunnu.edu.cn/", "https://io.hunnu.edu.cn/info/1036/2310.htm", "https://io.hunnu.edu.cn/info/1036/2308.htm", "https://github.com/X-John13/hunnu-campus-login-Dr.com/tree/d161f51af88f926ad015c5babfc19496f1424f4d"],
+  "protocol": {
+    "schemaVersion": 1,
+    "mode": "drcom-aes",
+    "roots": ["http://192.168.250.250/"],
+    "apiOrigin": "http://192.168.250.250:801",
+    "loginPath": "/eportal/portal/login",
+    "configPath": "/eportal/portal/page/loadConfig",
+    "jsVersion": "4.2.1",
+    "aesKey": "5c1d5ad4dea0e8dd",
+    "services": [{"label":"校园网","value":"0"},{"label":"移动","value":"1"},{"label":"联通","value":"2"},{"label":"电信","value":"3"}],
+    "checkedOn": "2026-10-16",
+    "notes": ["优先获取本次校园网 HTTP 重定向，根地址只作发现兜底，不保存旧会话 URL。", "运行时须从当前页/脚本识别 loadConfig、rcn、AES 及已适配公开前端密钥。", "只使用服务器本次返回的 rcn，缺失则停止，不随机伪造。", "HUNNU-5G 是近期作者观察的另一个 SSID，可由用户修改 Wi-Fi 字段；官方指南只明确 HUNNU。", "服务须由本人选择，不根据在线账号后缀猜运营商。"]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "requiresUserSsid": true,
+  "defaultSsid": "",
+  "kind": "browser",
+  "schemaVersion": 1,
+  "entry": "engine/campus-network-reconnect.ps1",
+  "fallbackPortal": "http://110.184.24.61/eportal/index.jsp",
+  "browser": {
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "input[name=\"username\"]",
+      "input[name=\"userName\"]",
+      "input[autocomplete=\"username\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "#login_submit",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "discoveryProbes": [
+      "http://www.msftconnecttest.com/connecttest.txt",
+      "http://www.163.com/",
+      "http://1.1.1.1/"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "services": [
+      {
+        "value": "telecom",
+        "label": "电信",
+        "aliases": [
+          "中国电信",
+          "电信"
+        ]
+      }
+    ],
+    "requireNetworkRedirect": true,
+    "serviceSelection": {
+      "containerSelectors": [
+        "[data-service-selection]",
+        "ion-alert",
+        "app-service-selection",
+        ".service-selection",
+        "body"
+      ],
+      "optionSelectors": [
+        "[role=\"radio\"]",
+        "ion-radio",
+        "label.service",
+        "button.service",
+        "span.service",
+        ".service-box"
+      ],
+      "confirmSelectors": [
+        "button:has-text(\"确定\")",
+        "button:has-text(\"确认\")",
+        "[role=\"button\"]:has-text(\"确定\")",
+        "ion-button:has-text(\"确定\")"
+      ],
+      "promptPattern": "请选择(?:服务|运营商)|选择(?:服务|运营商)"
+    }
+  },
+  "trustedOrigins": [
+    "http://110.184.24.61"
+  ],
+  "verification": "浏览器规则原型，未通过校内真实认证。仅清水河电信接入候选；不等同于教学区 UESTC-WiFi 的 wifi.uestc.edu.cn；须本人填写实际校园接入 Wi-Fi。",
+  "name": "电子科技大学（清水河电信）",
+  "id": "uestc-telecom",
+  "checkedOn": "2026-10-16",
+  "evidence": [
+    "https://github.com/eriihly/uestc-net-autologin",
+    "https://github.com/kohakunamori/UESTC_OpenWrt",
+    "https://duanyll.com/wiki/uestc-internet/cn/"
+  ],
+  "enabled": false
+}

@@ -1,0 +1,118 @@
+{
+  "requiresUserSsid": false,
+  "defaultSsid": "QLU-5.8G",
+  "kind": "browser",
+  "schemaVersion": 1,
+  "entry": "engine/campus-network-reconnect.ps1",
+  "fallbackPortal": "https://swrz.qlu.edu.cn/",
+  "browser": {
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "input[name=\"username\"]",
+      "input[name=\"userName\"]",
+      "input[autocomplete=\"username\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "#login_submit",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "discoveryProbes": [
+      "http://1.1.1.1/",
+      "http://www.msftconnecttest.com/connecttest.txt",
+      "http://www.163.com/"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "services": [
+      {
+        "value": "internet",
+        "label": "互联网",
+        "aliases": [
+          "互联网"
+        ]
+      }
+    ],
+    "requireNetworkRedirect": true,
+    "serviceSelection": {
+      "containerSelectors": [
+        "[data-service-selection]",
+        "ion-alert",
+        "app-service-selection",
+        ".service-selection",
+        "body"
+      ],
+      "optionSelectors": [
+        "[role=\"radio\"]",
+        "ion-radio",
+        "label.service",
+        "button.service",
+        "span.service",
+        ".service-box"
+      ],
+      "confirmSelectors": [
+        "button:has-text(\"确定\")",
+        "button:has-text(\"确认\")",
+        "[role=\"button\"]:has-text(\"确定\")",
+        "ion-button:has-text(\"确定\")"
+      ],
+      "promptPattern": "请选择(?:服务|运营商)|选择(?:服务|运营商)"
+    },
+    "entryPathPatterns": [
+      "^/(?:portal/(?:portal-main(?:/|$)|entry/)|eportal/(?:index\\.jsp|redirect\\.jsp)$|cas-sso/login(?:/|$))"
+    ],
+    "requireGatewayParameters": true
+  },
+  "trustedOrigins": [
+    "https://swrz.qlu.edu.cn",
+    "http://swrz.qlu.edu.cn"
+  ],
+  "verification": "2026 新生指南核对 swrz 域名和两种 Wi-Fi；9 月 SAM5 项目及独立用户脚本互证。仅新 Portal/CAS 且当前网关会话齐全时认证，校内真实联网待验收。",
+  "name": "齐鲁工业大学",
+  "id": "qlu",
+  "checkedOn": "2026-10-17",
+  "evidence": [
+    "https://wlyw.qlu.edu.cn/wiki/2026yx/network/",
+    "https://github.com/3511576098-ctrl/qlu-campus-autologin",
+    "https://github.com/maurice-xx/js"
+  ],
+  "enabled": false,
+  "ssidHints": [
+    "QLU-5.8G",
+    "QLU-2.4G"
+  ]
+}

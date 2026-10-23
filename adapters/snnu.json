@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "id": "snnu",
+  "name": "陕西师范大学",
+  "enabled": false,
+  "kind": "snnu-jsp",
+  "verification": "认证原型已实现，enabled=false，真实校内验收前不开放；当前在独立测试中验证表单会话、运营商、GB2312、单次提交及外网核验。",
+  "evidence": [
+    "https://xxc.snnu.edu.cn/info/2041/19703.htm",
+    "https://github.com/lcq666666/SNNU-school-network-reconnect-auto",
+    "https://github.com/solitude-sundae/snnu-autologin/blob/main/docs/01-%E6%8E%A5%E5%8F%A3%E9%80%86%E5%90%91%E6%96%87%E6%A1%A3.md",
+    "https://github.com/qwd3/SNNU-Autologin",
+    "https://github.com/i7-10700k/SNNU-Network-Auto-connection-tools",
+    "https://github.com/Baihao1201/network",
+    "https://github.com/morninghut/SNNU-connect"
+  ],
+  "nextSample": [
+    "暂不索取常规资料：网上已有 SSID、入口、表单字段、服务值及脱敏实测记录",
+    "下一阶段只需同学校内运行一次无密码预检，自动确认当前端口和表单",
+    "最终由同学在自己电脑输入凭据，验收未认证到外网恢复"
+  ],
+  "priority": 1,
+  "researchProfile": {
+    "schemaVersion": 1,
+    "mode": "snnu-jsp",
+    "ssid": "SNNU",
+    "roots": [
+      "http://202.117.144.205/",
+      "http://net.snnu.edu.cn/"
+    ],
+    "observedPorts": [
+      8601,
+      8602,
+      8603,
+      8605,
+      8609
+    ],
+    "allowedOrigins": [
+      "http://202.117.144.205",
+      "http://202.117.144.205:8601",
+      "http://202.117.144.205:8602",
+      "http://202.117.144.205:8603",
+      "http://202.117.144.205:8605",
+      "http://202.117.144.205:8609",
+      "http://net.snnu.edu.cn",
+      "http://net.snnu.edu.cn:8601",
+      "http://net.snnu.edu.cn:8602",
+      "http://net.snnu.edu.cn:8603",
+      "http://net.snnu.edu.cn:8605",
+      "http://net.snnu.edu.cn:8609"
+    ],
+    "loginPage": "/snnuportal/login.jsp",
+    "loginAction": "/snnuportal/login",
+    "statusPage": "/snnuportal/userstatus.jsp",
+    "formMethod": "POST",
+    "usernameField": "account",
+    "passwordField": "password",
+    "serviceField": "yys",
+    "captchaField": "checkcode",
+    "services": [
+      {
+        "label": "校园网",
+        "value": ""
+      },
+      {
+        "label": "联通",
+        "value": "unicom"
+      },
+      {
+        "label": "移动",
+        "value": "mobile"
+      },
+      {
+        "label": "电信",
+        "value": "telecom"
+      }
+    ],
+    "hiddenFieldNames": [
+      "sourceurl"
+    ],
+    "rememberPasswordField": "issave",
+    "responseEncoding": "gb2312",
+    "onlineText": "当前登录账号",
+    "onlineAccountId": "account",
+    "sourcesCheckedOn": "2026-10-16",
+    "notes": [
+      "仅用于无凭据 GET 预检，不接入自动认证任务",
+      "端口为公开实测观察值，不代表穷尽；未注册的新端口不能自动扩权",
+      "校园免费通道以空值为已采样依据；不把其他项目测试样本 plain 当作真实值",
+      "保留当前表单隐藏字段和 Cookie；未来认证实现不能固定旧端口或伪造会话",
+      "验证码触发条件和错误文案证据有限，不自动重试猜密码或切换运营商",
+      "普通浏览器入口可直接访问，系统需要认证提示是发现入口的一种方式"
+    ],
+    "requestEncoding": "gb2312"
+  },
+  "entry": "engine/campus-network-reconnect.ps1",
+  "defaultSsid": "SNNU",
+  "fallbackPortal": "http://202.117.144.205/",
+  "trustedOrigins": [
+    "http://202.117.144.205",
+    "http://202.117.144.205:8601",
+    "http://202.117.144.205:8602",
+    "http://202.117.144.205:8603",
+    "http://202.117.144.205:8605",
+    "http://202.117.144.205:8609",
+    "http://net.snnu.edu.cn",
+    "http://net.snnu.edu.cn:8601",
+    "http://net.snnu.edu.cn:8602",
+    "http://net.snnu.edu.cn:8603",
+    "http://net.snnu.edu.cn:8605",
+    "http://net.snnu.edu.cn:8609"
+  ]
+}

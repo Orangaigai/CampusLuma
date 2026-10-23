@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 私下报告安全问题
+    url: https://github.com/Orangaigai/CampusLuma/security/advisories/new
+    about: 涉及密码泄露、来源检查绕过等问题，请勿公开敏感材料。

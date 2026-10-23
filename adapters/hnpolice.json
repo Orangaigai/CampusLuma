@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "hnpolice",
+  "name": "湖南警察学院",
+  "enabled": false,
+  "kind": "research",
+  "verification": "官网已查阅，尚无足够公开证据确认当前认证厂商、入口和 SSID；需现场采样，不能猜测为锐捷或 Dr.COM。",
+  "evidence": ["https://www.hnpolice.com/"],
+  "nextSample": ["网络名称及接入方式", "认证页面截图和地址", "登录步骤", "是否专用客户端或人工验证"]
+}

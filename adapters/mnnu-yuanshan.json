@@ -1,0 +1,86 @@
+{
+  "requiresUserSsid": false,
+  "defaultSsid": "MNNU-WIFI",
+  "kind": "browser",
+  "schemaVersion": 1,
+  "entry": "engine/campus-network-reconnect.ps1",
+  "fallbackPortal": "http://10.254.1.200/",
+  "browser": {
+    "passwordSelectors": [
+      "input[type=\"password\"]",
+      "#password"
+    ],
+    "usernameSelectors": [
+      "#nameInput",
+      "#username",
+      "input[name=\"username\"]",
+      "input[name=\"userName\"]",
+      "input[autocomplete=\"username\"]",
+      "input[placeholder*=\"账号\"]",
+      "input[placeholder*=\"学号\"]"
+    ],
+    "submitSelectors": [
+      "#submitBtn",
+      "#login_submit",
+      "button[type=\"submit\"]",
+      "input[type=\"submit\"]",
+      "button:has-text(\"登录\")",
+      "[role=\"button\"]:has-text(\"登录\")",
+      ".login-btn",
+      ".login-button"
+    ],
+    "captchaSelectors": [
+      "input[name=\"captcha_code\"]:not([type=\"hidden\"])",
+      "input[name=\"captcha\"]",
+      "input[placeholder*=\"校验码\"]",
+      "input[placeholder*=\"验证码\"]",
+      "#captcha"
+    ],
+    "captchaImageSelectors": [
+      "img[src*=\"captcha\" i]",
+      "img[id*=\"captcha\" i]",
+      "img[src*=\"validate\" i]",
+      "img[alt*=\"验证码\"]",
+      "img[alt*=\"校验码\"]",
+      "canvas[id*=\"captcha\" i]"
+    ],
+    "discoveryProbes": [
+      "http://1.1.1.1/",
+      "http://www.msftconnecttest.com/connecttest.txt",
+      "http://www.163.com/"
+    ],
+    "agreementPattern": "同意|协议|条款|隐私|agree|terms",
+    "successPath": "/portal/assets/auth-success.html",
+    "successStorageKey": "customWujieAuthLogin",
+    "flowStorageKeys": {
+      "terminal": "terminalInfo",
+      "flow": "gmeFlowInfo",
+      "config": "portalStorgeConfig",
+      "first": "firstFlowParam"
+    },
+    "requireNetworkRedirect": true,
+    "entryPathPatterns": [
+      "^/(?:portal/(?:portal-main(?:/|$)|entry/)|eportal/(?:index\\.jsp|redirect\\.jsp)$|cas-sso/login(?:/|$))"
+    ],
+    "requireGatewayParameters": true
+  },
+  "trustedOrigins": [
+    "http://10.254.1.200",
+    "https://10.254.1.200",
+    "https://sso.mnnu.edu.cn"
+  ],
+  "verification": "受限原型：官方资料能确认无线名称和 10.254.1.200 自助地址，尚不能确认圆山 2026 新部署的实际网关。必须先采集本次入口；仅可信地址的新 Portal/CAS 及完整网关会话可执行。旧 10.254.1.12 接口不采用，未声称最新网关已核实。",
+  "name": "闽南师范大学（圆山）",
+  "id": "mnnu-yuanshan",
+  "checkedOn": "2026-10-17",
+  "evidence": [
+    "https://xxwlzx.mnnu.edu.cn/__local/6/F8/66/F3DD9B004A54D264C92CCCA7B59_2AFD8079_49CF3.pdf",
+    "https://xxwlzx.mnnu.edu.cn/info/1251/3581.htm",
+    "https://zbzx.mnnu.edu.cn/info/1010/35853.htm"
+  ],
+  "enabled": false,
+  "ssidHints": [
+    "MNNU-WIFI",
+    "MNNU-WIFI-5G"
+  ]
+}

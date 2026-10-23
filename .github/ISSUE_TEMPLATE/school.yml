@@ -1,0 +1,38 @@
+name: 学校适配与校内验收
+description: 提供当前学校流程，或提交已有原型的验收结果
+title: "[学校] "
+body:
+  - type: input
+    id: school
+    attributes:
+      label: 学校、校区与公开 Wi-Fi 名称
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: 当前官方说明或公开来源
+      description: 给出链接和发布日期；不要发送带个人终端参数的完整认证链接。
+    validations:
+      required: true
+  - type: textarea
+    id: flow
+    attributes:
+      label: 正常连接流程与运营商选项
+      description: 用文字说明或提供不含个人信息的截图；不能提交他人账号密码。
+  - type: dropdown
+    id: verification
+    attributes:
+      label: 当前核验程度
+      options:
+        - 仅提供公开资料
+        - 已在本人校内设备观察页面，尚未测试程序
+        - 已测试程序，但未确认真正未认证
+        - 已确认未认证，完成程序密码提交及外网恢复
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 测试版本、结果与剩余问题
+      description: 如有测试，附程序版本、时间、无感和 TUN 状态及脱敏结果，不发 HAR、Cookie 或密码。
