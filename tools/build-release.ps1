@@ -32,7 +32,7 @@ foreach($relative in $publicFiles){
 Copy-Item -LiteralPath (Join-Path $project 'docs\USAGE.md') -Destination (Join-Path $stage '使用说明.md')
 $modules=Join-Path $project 'engine\node_modules'
 if(-not(Test-Path -LiteralPath (Join-Path $modules 'ddddocr-node\package.json'))){throw 'Run npm ci before packaging.'}
-& "$env:WINDIR\System32\robocopy.exe" $modules (Join-Path $stage 'engine\node_modules') /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XD (Join-Path $modules 'onnxruntime-node\bin\napi-v3\darwin') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\linux') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\win32\arm64')
+& "$env:WINDIR\System32\robocopy.exe" $modules (Join-Path $stage 'engine\node_modules') /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XF '*.log' '*.har' '*.dmp' /XD '.turbo' (Join-Path $modules 'onnxruntime-node\bin\napi-v3\darwin') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\linux') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\win32\arm64')
 if($LASTEXITCODE -gt 7){throw 'Dependency copy failed.'}
 $global:LASTEXITCODE=0
 $node=(Get-Command node.exe -ErrorAction Stop).Source

@@ -6,19 +6,19 @@ $output=Join-Path $project ('artifacts\release-check-'+[guid]::NewGuid().ToStrin
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
 try{
-    $manifestEntry=@($zip.Entries|Where-Object {$_.FullName.EndsWith('/build-manifest.json')})
+    $manifestEntry=@($zip.Entries|Where-Object {$_.FullName.Replace('\','/').EndsWith('/build-manifest.json')})
     if($manifestEntry.Count -ne 1){throw 'Expected exactly one build manifest.'}
     $reader=New-Object IO.StreamReader($manifestEntry[0].Open())
     try{$manifest=$reader.ReadToEnd()|ConvertFrom-Json}finally{$reader.Dispose()}
     if($manifest.PersonalConfigurationIncluded -ne $false -or $manifest.SourceCommit -notmatch '^[0-9a-f]{40}$'){throw 'Invalid release metadata.'}
-    $prefix=$manifestEntry[0].FullName.Substring(0,$manifestEntry[0].FullName.Length-'build-manifest.json'.Length)
+    $prefix=$manifestEntry[0].FullName.Replace('\','/').Substring(0,$manifestEntry[0].FullName.Length-'build-manifest.json'.Length)
     $entries=@{}
     foreach($entry in $zip.Entries){
         $name=$entry.FullName.Replace('\','/')
         if(-not $name.StartsWith($prefix) -or $name -match '(^|/)\.\.?(/|$)' -or $entries.ContainsKey($name)){throw 'Unsafe or duplicate ZIP path.'}
         $entries[$name]=$entry
     }
-    $actualFiles=@($zip.Entries|Where-Object {-not $_.FullName.EndsWith('/')})
+    $actualFiles=@($zip.Entries|Where-Object {-not $_.FullName.Replace('\','/').EndsWith('/')})
     if($actualFiles.Count -ne $manifest.Files.Count+1){throw 'Unexpected ZIP file count.'}
     foreach($file in $manifest.Files){
         $entry=$entries[$prefix+$file.File]
