@@ -14,8 +14,8 @@ $ps=Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
 if($LASTEXITCODE -ne 0){throw 'Release build failed.'}
 $name='CampusLuma-v'+$version+'-windows-x64'
 $output=Join-Path $project 'artifacts\releases'
-$stage=Join-Path $output $name
-$zip=$stage+'.zip'
+$stage=Join-Path $output ('staging\v'+$version+'\CampusLuma')
+$zip=Join-Path $output ($name+'.zip')
 if((Test-Path -LiteralPath $stage) -or (Test-Path -LiteralPath $zip)){throw 'Release output exists; inspect it before rebuilding.'}
 foreach($directory in @('ui','engine','scripts','adapters','runtime','docs')){[IO.Directory]::CreateDirectory((Join-Path $stage $directory))|Out-Null}
 foreach($file in @('CampusLuma.exe','CampusLuma.Core.dll','LICENSE','THIRD-PARTY.md','README.md','CHANGELOG.md','CONTRIBUTING.md','CODE_OF_CONDUCT.md','SECURITY.md','VERIFICATION.md','VERSION','development.mode','启动微光校园.cmd')){
@@ -32,7 +32,7 @@ foreach($relative in $publicFiles){
 Copy-Item -LiteralPath (Join-Path $project 'docs\USAGE.md') -Destination (Join-Path $stage '使用说明.md')
 $modules=Join-Path $project 'engine\node_modules'
 if(-not(Test-Path -LiteralPath (Join-Path $modules 'ddddocr-node\package.json'))){throw 'Run npm ci before packaging.'}
-& "$env:WINDIR\System32\robocopy.exe" $modules (Join-Path $stage 'engine\node_modules') /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XF '*.log' '*.har' '*.dmp' /XD '.turbo' (Join-Path $modules 'onnxruntime-node\bin\napi-v3\darwin') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\linux') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\win32\arm64')
+& "$env:WINDIR\System32\robocopy.exe" $modules (Join-Path $stage 'engine\node_modules') /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XF '*.log' '*.har' '*.dmp' '*.map' /XD '.turbo' '__image_snapshots__' '__tests__' 'test' 'tests' 'fixtures' 'examples' 'docs' (Join-Path $modules 'onnxruntime-node\bin\napi-v3\darwin') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\linux') (Join-Path $modules 'onnxruntime-node\bin\napi-v3\win32\arm64')
 if($LASTEXITCODE -gt 7){throw 'Dependency copy failed.'}
 $global:LASTEXITCODE=0
 $node=(Get-Command node.exe -ErrorAction Stop).Source
@@ -45,11 +45,13 @@ if(-not(Test-Path -LiteralPath (Join-Path $stage 'engine\node_modules\playwright
 $privateFiles=@(Get-ChildItem -LiteralPath $stage -Recurse -File | Where-Object {$_.Name -match '^(credential|settings|data-location|last-run|run-history|schedule-receipt|last-auth-result)\.json$' -or $_.Extension -in @('.har','.log','.recovery')})
 if($privateFiles.Count){throw 'Package contains private state or diagnostics.'}
 $manifest=@{Project='CampusLuma';Version=$version;SourceCommit=$revision;NodeVersion=$nodeVersion;Platform='windows-x64';Preview=$true;DefaultEnabledSchools=@('xtu');PersonalConfigurationIncluded=$false;Files=@()}
+$manifestFiles=New-Object 'Collections.Generic.List[object]'
 foreach($file in (Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName)){
     $stream=[IO.File]::OpenRead($file.FullName);$sha=[Security.Cryptography.SHA256]::Create()
     try{$hash=([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-','').ToLowerInvariant()}finally{$stream.Dispose();$sha.Dispose()}
-    $manifest.Files+=@{File=$file.FullName.Substring($stage.Length+1).Replace('\','/');Sha256=$hash}
+    $manifestFiles.Add(@{File=$file.FullName.Substring($stage.Length+1).Replace('\','/');Sha256=$hash})
 }
+$manifest.Files=$manifestFiles.ToArray()
 [IO.File]::WriteAllText((Join-Path $stage 'build-manifest.json'),($manifest|ConvertTo-Json -Depth 5),(New-Object Text.UTF8Encoding($false)))
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $partial=$zip+'.partial'

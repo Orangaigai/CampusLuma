@@ -2,7 +2,7 @@
 
 ## 首次使用
 
-完整解压 Releases 的 Windows x64 包，放在自己可写、以后不随意移动的位置，打开 `CampusLuma.exe`。它依赖旁边的 ui、scripts、engine、adapters、runtime，不能只复制 exe。
+完整解压 Releases 的 Windows x64 包，放在自己可写、路径较短且以后不随意移动的位置，打开 `CampusLuma.exe`。不要在压缩包内直接运行。它依赖旁边的 ui、scripts、engine、adapters、runtime，不能只复制 exe。
 
 1. **学校**：普通预览版目前只有湘潭大学。其他学校有规则文件，不代表已开放。
 2. **校园网**：填写 Windows Wi-Fi 列表显示的名称，大小写与空格保持一致。需要先在 Windows 保存过这个 Wi-Fi 的连接配置；这不是网页地址。
