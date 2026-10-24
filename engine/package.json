@@ -1,6 +1,6 @@
 {
   "name": "campusluma-engine",
-  "version": "0.1.0-preview.1",
+  "version": "0.1.0-preview.2",
   "private": true,
   "type": "module",
   "description": "CampusLuma school-specific browser and HTTP portal authentication",

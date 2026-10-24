@@ -98,7 +98,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-offline.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests.ps1
 ```
 
-GitHub Actions 运行构建与隔离测试；绿色 CI 不等于某校已通过真实认证。[验证范围](VERIFICATION.md) · [架构](docs/ARCHITECTURE.md) · [更新记录](CHANGELOG.md)
+GitHub Actions 运行构建、隔离测试和原生窗口布局检查；绿色 CI 不等于某校已通过真实认证。[验证范围](VERIFICATION.md) · [界面设计](docs/UI-DESIGN.md) · [架构](docs/ARCHITECTURE.md) · [更新记录](CHANGELOG.md)
 
 后续优先完善湘大的安装升级与故障定位，再逐校验收陕西师大、湖南科大、湖南师大；暂不承诺“万能认证”。
 

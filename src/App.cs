@@ -33,6 +33,19 @@ namespace CampusLuma {
         void Say(string text,bool error=true) {
             var label=Find<TextBlock>("Toast"); label.Text=text;
             label.Foreground=(Brush)new BrushConverter().ConvertFromString(error?"#9B2525":"#666666");
+            label.Visibility=String.IsNullOrEmpty(text)?Visibility.Collapsed:Visibility.Visible;
+            if(!String.IsNullOrEmpty(text) && window.IsVisible)
+                label.Dispatcher.BeginInvoke(DispatcherPriority.Loaded,new Action(()=>{ if(label.IsVisible) label.BringIntoView(); }));
+        }
+
+        static void FitToWorkArea(Window target) {
+            var area=SystemParameters.WorkArea;
+            target.MaxHeight=Math.Max(320,area.Height-24);
+            target.MinHeight=Math.Min(target.MinHeight,target.MaxHeight);
+            target.MaxWidth=Math.Min(target.MaxWidth,Math.Max(320,area.Width-24));
+            target.MinWidth=Math.Min(target.MinWidth,target.MaxWidth);
+            target.Height=Math.Min(target.Height,target.MaxHeight);
+            target.Width=Math.Min(target.Width,target.MaxWidth);
         }
 
         [STAThread]
@@ -64,6 +77,8 @@ namespace CampusLuma {
         void Build(bool preview) {
             if(!preview && rememberDataRoot && File.Exists(Store.FilePath("settings.json"))) Store.RememberRoot();
             using(var reader=File.OpenRead(Path.Combine(Project,"ui","MainWindow.xaml"))) window=(Window)XamlReader.Load(reader);
+            FitToWorkArea(window);
+            window.Deactivated+=(sender,e)=>{ if(Find<ToggleButton>("PasswordToggle").IsChecked==true) Find<ToggleButton>("PasswordToggle").IsChecked=false; };
             try { loadedSettings=Store.Load(); }
             catch { loadedSettings=SchoolRegistry.Defaults(); Say("设置读取失败，请核对后重新保存。"); }
             var schools=SchoolRegistry.Available();
@@ -123,11 +138,13 @@ namespace CampusLuma {
                 var dialog=CreateHistoryWindow(RunJournal.Feedback(Store.Root,scheduleSnapshot,DateTime.Now));
                 dialog.Owner=window; dialog.ShowDialog();
             });
-            Find<Button>("EnableButton").Click+=async (sender,e)=>await Operate(async ()=>{ await Save(true); Say("已保存并启用。",false); });
+            Find<Button>("EnableButton").Click+=async (sender,e)=>await Operate(async ()=>{ Find<Button>("EnableButton").Content="保存中…"; await Save(true); Say("已保存并启用。",false); });
             Find<Button>("PauseButton").Click+=async (sender,e)=>await Operate(async ()=>{
+                Find<Button>("PauseButton").Content="暂停中…";
                 RequireSuccess(await Script("schedule.ps1","-Action","Disable")); await RefreshSchedule();
             });
             Find<Button>("ConnectButton").Click+=async (sender,e)=>await Operate(async ()=>{
+                Find<Button>("ConnectButton").Content="连接中…";
                 await Save(false); Say("正在连接…",false);
                 var reply=await Script("run-once.ps1"); ShowResult(reply); Say(Bool(reply,"Success")?"":Describe(Code(reply)));
             });
@@ -191,16 +208,21 @@ namespace CampusLuma {
             for(int position=0;position<times.Count;position++) {
                 int index=position;
                 var row=new StackPanel { Orientation=Orientation.Horizontal,Margin=new Thickness(0,0,8,8) };
-                var editor=new TextBox { Text=times[index],Width=74,MaxLength=5,ToolTip="连接时间（24 小时制）" };
+                var editor=new TextBox { Text=times[index],Width=80,MaxLength=8,ToolTip="连接时间（24 小时制）",HorizontalContentAlignment=HorizontalAlignment.Center };
                 AutomationProperties.SetAutomationId(editor,"TimeBox"+index);
                 AutomationProperties.SetName(editor,"连接时间 "+(index+1));
-                var remove=new Button { Content="×",Width=26,Padding=new Thickness(0),Margin=new Thickness(6,0,0,0),ToolTip="删除这个时间" };
+                var remove=new Button { Content="×",Width=28,Padding=new Thickness(0),Margin=new Thickness(4,0,0,0),ToolTip="删除这个时间",Style=(Style)window.FindResource("QuietButton") };
                 AutomationProperties.SetAutomationId(remove,"RemoveTime"+index);
+                AutomationProperties.SetName(remove,"删除时间 "+times[index]);
                 editor.TextChanged+=(sender,e)=>{ if(panel.Children.Contains(row)) { times[index]=editor.Text; UpdatePreview(); MarkDirty(); Say(""); } };
                 Action commit=()=>{ if(panel.Children.Contains(row)) editor.Text=NormalizeTime(editor.Text); };
                 editor.LostKeyboardFocus+=(sender,e)=>commit();
                 editor.PreviewKeyDown+=(sender,e)=>{ if(e.Key==Key.Enter) { commit(); e.Handled=true; } };
-                remove.Click+=(sender,e)=>{ times.RemoveAt(index); DrawTimes(); UpdatePreview(); MarkDirty(); Say(""); };
+                remove.Click+=(sender,e)=>{
+                    times.RemoveAt(index); DrawTimes(); UpdatePreview(); MarkDirty(); Say("");
+                    if(times.Count==0) Find<Button>("AddTimeButton").Focus();
+                    else { var neighbor=(StackPanel)panel.Children[Math.Min(index,times.Count-1)]; ((TextBox)neighbor.Children[0]).Focus(); }
+                };
                 row.Children.Add(editor); row.Children.Add(remove); panel.Children.Add(row);
             }
         }
@@ -209,6 +231,15 @@ namespace CampusLuma {
             bool custom=Find<RadioButton>("CustomMode").IsChecked==true;
             Find<StackPanel>("CustomPanel").Visibility=custom?Visibility.Visible:Visibility.Collapsed;
             Find<StackPanel>("IntervalPanel").Visibility=custom?Visibility.Collapsed:Visibility.Visible;
+            var normalized=times.Select(NormalizeTime).ToList();
+            var duplicateTimes=new HashSet<string>(normalized.GroupBy(value=>value).Where(group=>group.Count()>1).Select(group=>group.Key));
+            var rows=Find<WrapPanel>("TimeChips").Children;
+            for(int index=0;index<rows.Count;index++) {
+                var row=(StackPanel)rows[index];var editor=(TextBox)row.Children[0];bool valid=true;
+                try { Schedule.Minute(normalized[index]); } catch(ArgumentException) { valid=false; }
+                editor.Tag=custom && (!valid||duplicateTimes.Contains(normalized[index]))?"Invalid":null;
+                AutomationProperties.SetName((Button)row.Children[1],"删除时间 "+normalized[index]);
+            }
             try {
                 var expanded=Schedule.Expand(Collect());
                 Find<TextBlock>("PreviewText").Text="每天 "+String.Join("、",expanded.Take(5))+(expanded.Count>5?"等 "+expanded.Count+" 次":"，共 "+expanded.Count+" 次");
@@ -317,41 +348,93 @@ namespace CampusLuma {
             string time=Value(reply,"Time"); DateTime parsed;
             string when=DateTime.TryParse(time,out parsed)?parsed.ToString("MM-dd HH:mm"):"";
             label.Text="上次执行："+when+" "+Describe(Code(reply));
-            label.Foreground=(Brush)new BrushConverter().ConvertFromString(!Bool(reply,"Success") && Code(reply)!="CAMPUS_NOT_VISIBLE" && Code(reply)!="RUN_SKIPPED"?"#9B2525":"#666666");
+            label.Foreground=(Brush)new BrushConverter().ConvertFromString(IsFailure(reply)?"#9B2525":"#666666");
         }
         static string Describe(string code) { return ResultText.Describe(code); }
+        static bool IsFailure(Dictionary<string,object> run) {
+            return !Bool(run,"Success") && !new[]{"CAMPUS_NOT_VISIBLE","RUN_SKIPPED","CATCHUP_DISABLED","CATCHUP_OUTSIDE_WINDOW","CATCHUP_ALREADY_HANDLED"}.Contains(Code(run));
+        }
         Window CreateHistoryWindow(Dictionary<string,object> report) {
-            var dialog=new Window { Title="运行记录",Width=540,Height=440,MinWidth=420,MinHeight=300,
+            var dialog=new Window { Title="运行记录",Width=560,Height=500,MinWidth=420,MinHeight=320,
                 WindowStartupLocation=WindowStartupLocation.CenterOwner,Background=(Brush)new BrushConverter().ConvertFromString("#FAFAFA"),
-                FontFamily=new FontFamily("Microsoft YaHei UI"),FontSize=12 };
-            var panel=new DockPanel { Margin=new Thickness(16) };
-            var actions=new StackPanel { Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,12,0,0) };
-            var export=new Button { Content="导出反馈",Padding=new Thickness(12,5,12,5),Margin=new Thickness(0,0,8,0) };
-            var close=new Button { Content="关闭",Padding=new Thickness(12,5,12,5) };
-            actions.Children.Add(export);actions.Children.Add(close); DockPanel.SetDock(actions,Dock.Bottom);panel.Children.Add(actions);
-            var note=new TextBlock { Text="仅保留最近 100 次。反馈不包含账号、密码、Wi-Fi 名称、IP、MAC、网页会话或本机路径。",TextWrapping=TextWrapping.Wrap,Foreground=Brushes.DimGray,Margin=new Thickness(0,0,0,10) };
-            DockPanel.SetDock(note,Dock.Top);panel.Children.Add(note);
-            var text=new StringBuilder();
-            text.AppendLine("生成时间："+RunJournal.Time(report,"GeneratedAt").ToString("yyyy-MM-dd HH:mm:ss"));
+                FontFamily=new FontFamily("Microsoft YaHei UI"),FontSize=13,UseLayoutRounding=true };
+            FitToWorkArea(dialog);dialog.Resources.MergedDictionaries.Add(window.Resources);
+            NameScope.SetNameScope(dialog,new NameScope());
+            var panel=new DockPanel { Margin=new Thickness(20) };
+            var footer=new StackPanel { Margin=new Thickness(0,12,0,0) };
+            var note=new TextBlock { Text="最多保留 100 次。导出反馈不含账号、密码等个人信息。",TextWrapping=TextWrapping.Wrap,Foreground=Brushes.DimGray,FontSize=12,Margin=new Thickness(0,0,0,12) };
+            footer.Children.Add(note);
+            var actions=new StackPanel { Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right };
+            var export=new Button { Content="导出反馈",MinWidth=110,Margin=new Thickness(0,0,10,0),Style=(Style)window.FindResource("PrimaryButton") };
+            var close=new Button { Content="关闭",MinWidth=90,Style=(Style)window.FindResource(typeof(Button)),IsCancel=true };
+            dialog.RegisterName("HistoryExportButton",export);dialog.RegisterName("HistoryCloseButton",close);
+            actions.Children.Add(export);actions.Children.Add(close);footer.Children.Add(actions);DockPanel.SetDock(footer,Dock.Bottom);panel.Children.Add(footer);
             var task=(Dictionary<string,object>)report["Schedule"];
-            if(scheduleSnapshot==null) text.AppendLine("计划状态：本次未取得，不能据此判断是否启用。");
+            var header=new StackPanel { Margin=new Thickness(0,0,0,14) };
+            var summary=new TextBlock { FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap };
+            var detail=new TextBlock { Foreground=Brushes.DimGray,FontSize=12,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,6,0,0) };
+            dialog.RegisterName("HistorySummary",summary);
+            if(scheduleSnapshot==null) { summary.Text="计划状态暂不可用";detail.Text="以下展示已记录的连接结果，不据此判断计划是否启用。"; }
             else {
-                text.AppendLine("计划状态："+(Bool(task,"Enabled")?"已启用":"未启用"));
-                text.AppendLine("登录后补连："+(Bool(task,"CatchUpEnabled")?"已启用，限错过后 2 小时":"未启用"));
-                text.AppendLine("下次执行："+Value(task,"NextRun").Replace('T',' '));
-                text.AppendLine("系统上次启动任务："+Value(task,"LastRun").Replace('T',' '));
-                if(task.ContainsKey("LastExitCode")) text.AppendLine("系统返回码：0x"+unchecked((uint)Convert.ToInt64(task["LastExitCode"])).ToString("X8"));
+                summary.Text=Bool(task,"Enabled")?"自动连接已启用":"自动连接未启用";
+                detail.Text=Bool(task,"Enabled")?"下次连接："+Value(task,"NextRun").Replace('T',' '):"可以在主窗口设置时间并启用。";
+                if(Bool(task,"CatchUpEnabled")) detail.Text+="\n登录后可补连一次，限错过后 2 小时。";
             }
-            text.AppendLine("系统返回码仅说明任务执行状态；联网结果以下方记录为准。");
-            text.AppendLine();
-            if(report.ContainsKey("LastRun")) AppendRun(text,(Dictionary<string,object>)report["LastRun"],"最近一次：");
-            text.AppendLine();text.AppendLine("最近记录（新版本启用后开始累积）：");
-            var runs=(List<Dictionary<string,object>>)report["Runs"];
-            foreach(var run in runs.AsEnumerable().Reverse()) AppendRun(text,run,"");
-            if(runs.Count==0) text.AppendLine("暂无记录。没有记录不能证明认证失败。");
-            if(Value(report,"HistoryStatus")!="OK" && Value(report,"HistoryStatus")!="NOT_YET_RECORDED") text.AppendLine("记录文件暂时无法读取；本次反馈不包含历史记录。");
-            var body=new TextBox { Text=text.ToString(),IsReadOnly=true,TextWrapping=TextWrapping.Wrap,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,Padding=new Thickness(10),Background=Brushes.White };
-            panel.Children.Add(body);dialog.Content=panel;
+            header.Children.Add(summary);header.Children.Add(detail);
+            if(scheduleSnapshot!=null) {
+                var diagnostics=new Expander { Header="任务详情",FontSize=12,Foreground=Brushes.DimGray,Margin=new Thickness(0,8,0,0) };
+                dialog.RegisterName("HistoryDetails",diagnostics);
+                string system="系统上次启动："+Value(task,"LastRun").Replace('T',' ');
+                if(task.ContainsKey("LastExitCode")) system+="\n系统返回码：0x"+unchecked((uint)Convert.ToInt64(task["LastExitCode"])).ToString("X8");
+                system+="\n返回码仅说明任务执行状态，联网结果以下方记录为准。";
+                diagnostics.Content=new TextBlock { Text=system,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(18,6,0,0) };header.Children.Add(diagnostics);
+            }
+            DockPanel.SetDock(header,Dock.Top);panel.Children.Add(header);
+            var runs=new List<Dictionary<string,object>>((List<Dictionary<string,object>>)report["Runs"]);
+            if(runs.Count==0 && report.ContainsKey("LastRun")) {
+                var previous=report["LastRun"] as Dictionary<string,object>;
+                if(previous!=null) {
+                    runs.Add(previous);
+                    detail.Text+=Value(report,"HistoryStatus")=="OK"||Value(report,"HistoryStatus")=="NOT_YET_RECORDED"?"\n暂无新版本历史，下方显示最近一次保存的结果。":"\n历史记录暂时无法读取，下方仅显示最近一次保存的结果。";
+                }
+            }
+            var body=new Grid();
+            var list=new ListBox { BorderThickness=new Thickness(0),Background=Brushes.White,HorizontalContentAlignment=HorizontalAlignment.Stretch };
+            ScrollViewer.SetHorizontalScrollBarVisibility(list,ScrollBarVisibility.Disabled);
+            AutomationProperties.SetName(list,"最近运行记录，最新的在前");dialog.RegisterName("HistoryList",list);
+            foreach(var run in runs.AsEnumerable().Reverse()) {
+                var row=new StackPanel { Margin=new Thickness(12,10,12,10) };
+                var meta=new DockPanel();
+                if(run.ContainsKey("DurationMs")) {
+                    var duration=new TextBlock { Text=(Convert.ToDouble(run["DurationMs"])/1000).ToString("0.0",CultureInfo.InvariantCulture)+" 秒",FontSize=12,Foreground=Brushes.DimGray,Margin=new Thickness(12,0,0,0) };
+                    DockPanel.SetDock(duration,Dock.Right);meta.Children.Add(duration);
+                }
+                DateTime time=RunJournal.Time(run,"Time");
+                meta.Children.Add(new TextBlock { Text=time==DateTime.MinValue?"时间未知":time.ToString("MM-dd HH:mm:ss"),FontSize=12,Foreground=Brushes.DimGray });
+                row.Children.Add(meta);
+                row.Children.Add(new TextBlock { Text=Describe(Value(run,"Code")),TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,5,0,0),Foreground=IsFailure(run)?(Brush)new BrushConverter().ConvertFromString("#9B2525"):Brushes.Black });
+                string origin=Value(run,"Origin"),code=Value(run,"Code");
+                string context=origin=="Scheduled"?"定时执行":origin=="Manual"?"手动连接":origin=="LogonCatchUp"?"登录后补连":"";
+                string authentication=code=="ALREADY_ONLINE"?"认证前已联网，未提交密码":code=="ONLINE_AFTER_AUTH"?(Bool(run,"AuthenticationAttempted")?"已提交认证，外网已确认":"外网已确认可用"):Bool(run,"AuthenticationAttempted")?"已提交认证":"未提交认证";
+                if(origin=="LogonCatchUp" && !IsFailure(run) && !Bool(run,"AuthenticationAttempted")) authentication="本次未提交密码";
+                context+=(String.IsNullOrEmpty(context)?"":" · ")+authentication;
+                string diagnostic=BrowserErrorDetail(run);
+                if(!String.IsNullOrEmpty(diagnostic)) context+=" · "+diagnostic;
+                if(run.ContainsKey("WifiErrorCode")) context+=" · 系统网络错误码 "+Value(run,"WifiErrorCode");
+                if(run.ContainsKey("StartupAttempts")) context+=" · 初始化 "+Value(run,"StartupAttempts")+" 次";
+                row.Children.Add(new TextBlock { Text=context,FontSize=12,Foreground=Brushes.DimGray,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,4,0,0) });
+                var copy=new StringBuilder();AppendRun(copy,run,"");
+                var item=new ListBoxItem { Content=new Border { Child=row,BorderBrush=(Brush)new BrushConverter().ConvertFromString("#E6E6E6"),BorderThickness=new Thickness(0,0,0,1) },Style=(Style)window.FindResource("HistoryItem"),Tag=copy.ToString().Trim(),ToolTip="选中后按 Ctrl+C 复制这条记录" };
+                AutomationProperties.SetName(item,copy.ToString().Trim());list.Items.Add(item);
+            }
+            list.PreviewKeyDown+=(s,e)=>{ if(e.Key==Key.C && (Keyboard.Modifiers&ModifierKeys.Control)!=0 && list.SelectedItem is ListBoxItem) {
+                try { Clipboard.SetText((string)((ListBoxItem)list.SelectedItem).Tag);e.Handled=true; } catch(System.Runtime.InteropServices.ExternalException) {}
+            }};
+            body.Children.Add(list);
+            var empty=new TextBlock { Text=Value(report,"HistoryStatus")=="OK"||Value(report,"HistoryStatus")=="NOT_YET_RECORDED"?"暂无运行记录\n首次执行后，这里会显示连接结果。":"记录暂时无法读取\n可导出反馈，或稍后重新打开。",TextAlignment=TextAlignment.Center,TextWrapping=TextWrapping.Wrap,Foreground=Brushes.DimGray,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(16),Visibility=runs.Count==0?Visibility.Visible:Visibility.Collapsed };
+            dialog.RegisterName("HistoryEmpty",empty);body.Children.Add(empty);
+            panel.Children.Add(new Border { Child=body,Background=Brushes.White,BorderBrush=(Brush)new BrushConverter().ConvertFromString("#DEDEDE"),BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(4) });
+            var frame=new Grid { Background=dialog.Background };frame.Children.Add(panel);dialog.Content=frame;
             close.Click+=(s,e)=>dialog.Close();
             export.Click+=(s,e)=>{
                 var picker=new Microsoft.Win32.SaveFileDialog { Title="保存脱敏反馈",FileName="校园网反馈-"+DateTime.Now.ToString("yyyyMMdd-HHmmss")+".json",Filter="反馈文件 (*.json)|*.json",DefaultExt=".json",AddExtension=true };
@@ -367,12 +450,21 @@ namespace CampusLuma {
             if(Value(run,"Origin")=="LogonCatchUp") text.Append("（登录后补连）");
             if(code=="ALREADY_ONLINE") text.Append("（认证前已联网，未提交密码）");
             else if(code=="ONLINE_AFTER_AUTH") text.Append(Bool(run,"AuthenticationAttempted")?"（已提交认证，并核实外网可用）":"（恢复后外网可用）");
-            var startup=new Dictionary<string,string>{{"EDGE_NOT_FOUND","找不到 Edge"},{"EDGE_ACCESS_DENIED","浏览器启动被拒绝"},{"EDGE_STARTUP_TIMEOUT","浏览器启动超时"},{"EDGE_PROCESS_CLOSED","浏览器提前退出"},{"EDGE_STARTUP_ERROR","浏览器初始化异常"}};
-            string detail=Value(run,"ErrorCode");if(startup.ContainsKey(detail)) text.Append("；").Append(startup[detail]);
+            string detail=BrowserErrorDetail(run);if(!String.IsNullOrEmpty(detail)) text.Append("；").Append(detail);
             if(run.ContainsKey("WifiErrorCode")) text.Append("；系统网络错误码 ").Append(Value(run,"WifiErrorCode"));
             if(run.ContainsKey("StartupAttempts")) text.Append("；初始化 ").Append(Value(run,"StartupAttempts")).Append(" 次");
             if(run.ContainsKey("DurationMs")) text.Append("  ").Append((Convert.ToDouble(run["DurationMs"])/1000).ToString("0.0",CultureInfo.InvariantCulture)).Append(" 秒");
             text.AppendLine();
+        }
+        static string BrowserErrorDetail(Dictionary<string,object> run) {
+            switch(Value(run,"ErrorCode")) {
+                case "EDGE_NOT_FOUND": return "找不到 Edge";
+                case "EDGE_ACCESS_DENIED": return "浏览器启动被拒绝";
+                case "EDGE_STARTUP_TIMEOUT": return "浏览器启动超时";
+                case "EDGE_PROCESS_CLOSED": return "浏览器提前退出";
+                case "EDGE_STARTUP_ERROR": return "浏览器初始化异常";
+                default: return "";
+            }
         }
         async Task Operate(Func<Task> action) {
             if(busy) return; busy=true; Say(""); SetEnabled(false);
@@ -380,6 +472,7 @@ namespace CampusLuma {
             finally { busy=false; SetEnabled(true); }
         }
         void SetEnabled(bool enabled) {
+            if(enabled) { Find<Button>("EnableButton").Content="保存并启用";Find<Button>("PauseButton").Content="暂停";Find<Button>("ConnectButton").Content="立即连接"; }
             foreach(string name in new[]{"EnableButton","PauseButton","ConnectButton","AddTimeButton","HistoryButton"}) Find<Button>(name).IsEnabled=enabled;
             foreach(string name in new[]{"SsidBox","UsernameBox","StartBox","EndBox","HoursBox"}) Find<TextBox>(name).IsEnabled=enabled;
             Find<PasswordBox>("PasswordBox").IsEnabled=enabled;

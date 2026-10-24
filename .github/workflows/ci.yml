@@ -33,5 +33,7 @@ jobs:
         run: npm.cmd --prefix engine ci
       - name: Build and run isolated tests
         run: .\tests\run-offline.ps1
+      - name: Verify window layout without changing the real network
+        run: .\tests\verify-ui-layout.ps1
       - name: Audit public source files
         run: node.exe tools/check-public.mjs

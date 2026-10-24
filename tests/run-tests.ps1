@@ -2,6 +2,8 @@
 $root=Split-Path $PSScriptRoot -Parent
 $powershellExe=Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
 & (Join-Path $root 'build.ps1')
+& $powershellExe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'verify-ui-layout.ps1')
+if($LASTEXITCODE -ne 0) { throw 'Window layout checks failed.' }
 & $powershellExe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'verify-run-journal.ps1')
 if($LASTEXITCODE -ne 0) { throw 'Run journal tests failed.' }
 & $powershellExe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'verify-schedule-recovery.ps1')
